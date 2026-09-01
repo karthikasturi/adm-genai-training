@@ -38,3 +38,14 @@ course-outline/*_Content.md
 *_Trainer_Notes.docx
 course-outline/*Course-Outline*.docx
 lab/**/*_Demo_Guide.md
+
+# Skills folder
+skills/
+
+# Capstone deliverables
+capstone/Meridian_Hospitality_Capstone_Case_Study.docx
+capstone/ADM lab requirement.docx
+capstone/ADM Learners list.xlsx
+
+# Presentation deliverables
+presentation/Day10_Slide_Content.md
