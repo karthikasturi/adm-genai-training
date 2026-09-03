@@ -1,0 +1,8 @@
+# Pinned to the current major version of each SDK as of 2026-09-04.
+# openai>=3.0 and anthropic>=1.0 both changed their default HTTP client to
+# httpx2 under the hood - that only matters if you customize timeouts or
+# transports, which these exercises don't. anthropic>=1.0 requires Python
+# >= 3.10.
+openai>=3.0
+anthropic>=1.0
+python-dotenv>=1.2
