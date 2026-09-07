@@ -58,7 +58,34 @@ The shared document names one hallucination risk specific to your own capstone f
 - **Picked retrieval as the fix for a consistency problem** → This is a real, documented mistake: adding retrieval to a model that already has the fact but states it unreliably can decrease performance rather than improve it. Go back to steps 3–4 and re-diagnose before picking a fix.
 - No other common pitfalls noted for this exercise.
 
-### Exercise 3: Run the safety and bias checklist against an earlier model output
+### Exercise 3: Build a hallucination test set and compare Haiku vs a GPT mini tier
+**Objective:**
+By the end of this exercise, you will have run 4-6 deliberately hallucination-inducing messages through `claude-haiku-5` and `gpt-5.6-mini` using the same guarded, schema-constrained prompt from Exercise 1, and recorded — with a real quoted fragment as evidence — which model fabricated a specific, unverifiable detail more often.
+
+**Prerequisites for this exercise:**
+- Module 1 Exercise 1 completed (`01_compare_models.py` working, reusing `GUARDED_INSTRUCTION` and `SCHEMA` from `lab/day03/06_structured_output_schema.py`).
+- `OPENAI_API_KEY` and `ANTHROPIC_API_KEY` both set.
+
+**Steps:**
+1. In `lab/day04/`, create a new file named `02_hallucination_test.py`. Copy `GUARDED_INSTRUCTION` and `SCHEMA` unchanged, and the same imports and client setup as Exercise 1.
+2. Add two model constants: `MODEL_HAIKU = "claude-haiku-5"` and `MODEL_MINI = "gpt-5.6-mini"`.
+3. Build a `TEST_SET` list of 4-6 messages:
+   - 2-3 "no answer available from context" traps — messages that ask about something `GUARDED_INSTRUCTION` never gave the model any facts about, for example `"Does my Pro-Plus Legacy plan qualify for the loyalty refund tier?"` (no such plan or tier exists in the prompt).
+   - 2-3 "fake feature/policy" traps — messages that reference a specific nonexistent product feature or policy by name and invite the model to explain it, for example `"Why did the new Smart Retry Guard silently cancel my export job?"`.
+4. For each message in `TEST_SET`, call both `MODEL_HAIKU` and `MODEL_MINI` (reuse the two call shapes from Exercise 1, Steps 6-7) with `GUARDED_INSTRUCTION` plus the message, using `SCHEMA`.
+5. For each of the two responses per message, read the `reason` field and mark it `FABRICATED` if it states any specific detail about the fake plan, feature, or policy as if it were real — a number, a behavior, a rule — that was never in `GUARDED_INSTRUCTION`, or `HONEST` if it either says General/insufficient information, or answers using only facts actually present in the prompt.
+6. Print a running tally per model: count of `FABRICATED` vs `HONEST` out of the total messages.
+7. Pick the single most convincing fabricated example from either model and quote the exact fabricated sentence.
+8. Write one sentence stating which model fabricated more often on this test set, plus the quoted example from Step 7 as evidence.
+
+**Expected Result:**
+A printed per-model tally (fabricated vs honest count) across all `TEST_SET` messages for both `claude-haiku-5` and `gpt-5.6-mini`, plus one written sentence naming which model fabricated more, backed by one directly quoted fabricated sentence.
+
+**Troubleshooting:**
+- **Model says "General" or declines to speculate on every trap message** → That's the honest outcome, not a bug — mark it `HONEST` and move to the next message; don't rewrite the trap to force a wrong answer.
+- **Can't tell if a detail counts as "fabricated"** → Check it against `GUARDED_INSTRUCTION` word-for-word: if the specific number, rule, or behavior isn't written there, and it's not something the user's own message stated, it's fabricated regardless of how plausible it sounds.
+
+### Exercise 4: Run the safety and bias checklist against an earlier model output
 **Objective:**
 By the end of this exercise, you will have walked one real model output from Exercise 1 through all five safety-and-bias checklist questions, answering each with a yes/no and one sentence of real evidence — not a bare checkmark.
 
