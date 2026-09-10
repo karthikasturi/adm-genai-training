@@ -59,11 +59,11 @@ collection = chroma_client.create_collection(
     name="hospitality_docs",
     metadata={"hnsw:space": "cosine"},
 )
-_response = client.embeddings.create(model=EMBEDDING_MODEL, input=DOCUMENTS)
+#_response = client.embeddings.create(model=EMBEDDING_MODEL, input=DOCUMENTS)
 collection.add(
     ids=DOCUMENT_IDS,
     documents=DOCUMENTS,
-    embeddings=[item.embedding for item in _response.data],
+    #embeddings=[item.embedding for item in _response.data],
 )
 
 
@@ -72,6 +72,7 @@ collection.add(
 #   results = collection.query(query_texts=[GUEST_QUESTION], n_results=3)
 # (Chroma calls its own embedding function on query_texts automatically -
 # you don't have to embed the query yourself the way exercise 01 did.)
+# question_embedding = client.embeddings.create(model=EMBEDDING_MODEL, input=[GUEST_QUESTION])
 results = collection.query(query_texts=[GUEST_QUESTION], n_results=3)
 
 
