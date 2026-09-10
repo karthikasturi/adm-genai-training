@@ -1,0 +1,14 @@
+# Current major versions as of 2026-09-10, verified installable and
+# working together against the exact API surface these exercises use
+# (client.embeddings.create, chromadb.Client/create_collection,
+# RecursiveCharacterTextSplitter, langchain_chroma.Chroma, as_retriever,
+# with_structured_output, init_chat_model).
+openai>=2.5
+chromadb>=1.4
+langchain>=1.3
+langchain-text-splitters>=1.0
+langchain-openai>=1.3
+langchain-chroma>=0.3
+langgraph>=1.2
+pydantic>=2.10
+python-dotenv>=1.2
