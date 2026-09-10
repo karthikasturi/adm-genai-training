@@ -1,6 +1,6 @@
 # Day 16 — RAG stack, vector databases & retrieval exercises
 
-Six standalone exercises, one RAG-stack concept per file. Each file uses
+Seven standalone exercises, one RAG-stack concept per file. Each file uses
 the same running scenario for continuity: a small set of hospitality
 reference documents (policy, amenities, menu, listing, or lease text,
 depending on your team's brief) that a guest-facing assistant needs to
@@ -52,11 +52,14 @@ cp .env.example .env
 | `04_chunking_comparison.py` | `RecursiveCharacterTextSplitter` — chunking, and comparing retrieval before/after |
 | `05_rag_pipeline.py` | Assembling a full RAG pipeline: a retriever plus a generator, wrapped as a tool |
 | `06_reranking_eval.py` | LLM-based reranking, evaluated against plain similarity search on a small query set |
+| `07_lcel_rag_chain.py` | Composing exercise 05's retriever + generator as a single LCEL chain (`invoke`/`stream`/`batch`) |
 
 Work through them in order — `02` and `03` both build on `01`'s embedding
 call, `04`'s chunked documents are what `05` actually loads and retrieves
-from, and `06` reruns `03`'s plain similarity search side by side with a
-reranked version of the same candidates.
+from, `06` reruns `03`'s plain similarity search side by side with a
+reranked version of the same candidates, and `07` rebuilds `05`'s
+hand-written retrieve-then-generate function as a single composed LCEL
+chain, to compare the two ways of assembling the same pipeline.
 
 ## A note on embeddings and vendor choice
 
@@ -93,3 +96,18 @@ have provisioned, scored with the same guardrailed, structured-output
 pattern from Day 12, rather than a dedicated cross-encoder reranker
 model or a hosted rerank API — both would need a new vendor account or a
 model download from a host outside this course's whitelisted network.
+
+## A note on LCEL vs. agentic RAG
+
+Exercise 07 composes exercise 05's retrieve-then-generate function as a
+single LCEL (LangChain Expression Language) chain instead, using
+`langchain_core`'s Runnable primitives (`RunnablePassthrough`, the `|`
+pipe operator) rather than the older `create_stuff_documents_chain` /
+`create_retrieval_chain` helpers — those moved into the `langchain_classic`
+package as a legacy surface in the current LangChain major version, so
+this exercise deliberately avoids teaching them as if current. LangChain's
+own current documentation frames exercise 07's shape as "2-step RAG"
+(retrieve, then generate, in a fixed order), distinct from "agentic RAG" (a
+tool-calling agent decides for itself when and what to retrieve). Building
+the agentic version — handing exercise 05's RAG tool to a decision loop a
+model drives itself — is Day 17 / Module 17A's job next, not repeated here.
