@@ -1,10 +1,11 @@
 # Day 17 — Agentic AI workflows & orchestration exercises
 
-Twelve standalone exercises: seven core exercises (one agentic-loop concept
-per file), four bonus exercises on other agentic workflow patterns, and one
-core-adjacent exercise comparing the hand-built loop against LangChain's
-prebuilt `create_agent` (see below for both). Each file uses the same
-running scenario for continuity: the same
+Thirteen standalone exercises: seven core exercises (one agentic-loop
+concept per file), four bonus exercises on other agentic workflow patterns,
+one core-adjacent exercise comparing the hand-built loop against
+LangChain's prebuilt `create_agent`, and one further-out bonus exercise
+climbing to LangChain's Deep Agents tier (see below for all three groups).
+Each file uses the same running scenario for continuity: the same
 hospitality guest-facing assistant from Days 15-16, now given BOTH of its
 previously-built tools at once and let loose in a real decision loop. It's a
 stand-in for your own Sprint 3 agent — wherever you see
@@ -110,6 +111,30 @@ fully "once the loop, the stopping condition, and the tool set it wraps have
 all been built and seen working by hand," i.e. exactly after exercise 07.
 It isn't one of the outline's six graded hands-on lines either, which is why
 it's numbered after the bonus patterns rather than folded into 01–07.
+
+## Further out: LangChain Deep Agents
+
+| File | Concept |
+|---|---|
+| `13_deep_agents_comparison.py` | `create_deep_agent`: built-in planning (`write_todos`), a virtual filesystem, and genuine subagent delegation (the `task` tool), on a deliberately larger, multi-part task than exercises 01–12 use |
+
+**This one goes further than exercise 12 does.** The Day 17 course content's
+own Landscape anchor is explicit that Deep Agents "stays outside today's
+scope entirely... never built against" — named only as the next tier up.
+Exercise 13 was built anyway, on request, as a genuine look at where
+LangChain's stack goes past today's actual graded scope — not because the
+outline calls for it. Its own SCOPE NOTE says this again, in place, before
+any code. It's also the one file in this whole set needing a package beyond
+what Days 15–16 already installed (`deepagents` — see `requirements.txt`),
+and the one built against a package that current documentation itself
+describes as actively developing — re-confirm parameter names against
+[deepagents' current reference](https://reference.langchain.com/python/deepagents)
+before relying on them.
+
+**Sources:**
+- [LangChain: Deep Agents overview](https://docs.langchain.com/oss/python/deepagents/overview)
+- [create_deep_agent reference](https://reference.langchain.com/python/deepagents/graph/create_deep_agent)
+- [deepagents (GitHub)](https://github.com/langchain-ai/deepagents)
 
 ## A note on the two reused tools
 

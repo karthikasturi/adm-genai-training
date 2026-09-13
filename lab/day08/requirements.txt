@@ -3,8 +3,9 @@
 # (StateGraph/add_conditional_edges, ToolNode, tools_condition, add_messages,
 # @tool, bind_tools, with_structured_output, init_chat_model,
 # OpenAIEmbeddings, langchain_chroma.Chroma). No new package beyond what
-# Days 15-16 (lab/day06, lab/day07) already installed - today's course
-# content is explicit that no new package or network domain is needed.
+# Days 15-16 (lab/day06, lab/day07) already installed for exercises 01-12 -
+# today's course content is explicit that no new package or network domain
+# is needed for the graded outline.
 langchain>=1.3
 langgraph>=1.2
 langchain-openai>=1.3
@@ -12,3 +13,10 @@ langchain-chroma>=0.3
 chromadb>=1.4
 pydantic>=2.10
 python-dotenv>=1.2
+
+# deepagents is the one genuinely new package in this lab set, needed ONLY
+# for exercise 13 (bonus, beyond the graded outline's own scope - see that
+# file's SCOPE NOTE). An actively developing package - confirm the current
+# API against https://reference.langchain.com/python/deepagents before
+# relying on any parameter name.
+deepagents>=0.6
