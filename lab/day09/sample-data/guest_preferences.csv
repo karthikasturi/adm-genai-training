@@ -1,0 +1,51 @@
+guest_preference_id,guest_id,preference_type,detail,flagged
+GP-0001,G-0015,Amenity,Welcome fruit basket and spa credit,True
+GP-0002,G-0052,Amenity,Room upgrade to suite category,False
+GP-0003,G-0013,Room,"Quiet room, away from street noise",False
+GP-0004,G-0037,Amenity,Room upgrade to suite category,True
+GP-0005,G-0019,Amenity,Complimentary bottle of anniversary champagne,True
+GP-0006,G-0027,Dietary,Gluten-free,False
+GP-0007,G-0052,Accessibility,Wheelchair-accessible room required,False
+GP-0008,G-0017,Dietary,Vegetarian meals only,False
+GP-0009,G-0056,Room,"Quiet room, away from street noise",False
+GP-0010,G-0007,Amenity,Welcome fruit basket and spa credit,False
+GP-0011,G-0019,Dietary,Severe nut allergy - kitchen must be notified,False
+GP-0012,G-0018,Amenity,Room upgrade to suite category,False
+GP-0013,G-0010,Amenity,Complimentary bottle of anniversary champagne,True
+GP-0014,G-0059,Room,"High floor, away from elevator",False
+GP-0015,G-0057,Room,"Quiet room, away from street noise",True
+GP-0016,G-0027,Dietary,Vegetarian meals only,False
+GP-0017,G-0024,Room,"High floor, away from elevator",False
+GP-0018,G-0006,Room,"Quiet room, away from street noise",False
+GP-0019,G-0021,Dietary,Severe nut allergy - kitchen must be notified,False
+GP-0020,G-0042,Room,"Quiet room, away from street noise",False
+GP-0021,G-0009,Dietary,Vegetarian meals only,False
+GP-0022,G-0054,Amenity,Room upgrade to suite category,True
+GP-0023,G-0009,Amenity,Room upgrade to suite category,True
+GP-0024,G-0001,Dietary,Severe nut allergy - kitchen must be notified,False
+GP-0025,G-0014,Dietary,Gluten-free,False
+GP-0026,G-0047,Accessibility,Wheelchair-accessible room required,False
+GP-0027,G-0008,Room,Extra pillows requested,False
+GP-0028,G-0008,Dietary,Vegetarian meals only,False
+GP-0029,G-0041,Accessibility,Wheelchair-accessible room required,False
+GP-0030,G-0008,Amenity,Room upgrade to suite category,True
+GP-0031,G-0002,Accessibility,Hearing-impaired kit requested,False
+GP-0032,G-0016,Dietary,Gluten-free,False
+GP-0033,G-0001,Accessibility,Wheelchair-accessible room required,False
+GP-0034,G-0037,Amenity,Complimentary bottle of anniversary champagne,True
+GP-0035,G-0043,Dietary,Severe nut allergy - kitchen must be notified,False
+GP-0036,G-0024,Dietary,Severe nut allergy - kitchen must be notified,True
+GP-0037,G-0035,Amenity,Welcome fruit basket and spa credit,True
+GP-0038,G-0033,Amenity,Welcome fruit basket and spa credit,True
+GP-0039,G-0056,Amenity,Room upgrade to suite category,True
+GP-0040,G-0025,Room,"Quiet room, away from street noise",False
+GP-0041,G-0002,Room,"Quiet room, away from street noise",False
+GP-0042,G-0023,Room,"High floor, away from elevator",False
+GP-0043,G-0041,Dietary,Severe nut allergy - kitchen must be notified,False
+GP-0044,G-0048,Room,"Quiet room, away from street noise",False
+GP-0045,G-0023,Amenity,Welcome fruit basket and spa credit,True
+GP-0046,G-0042,Dietary,Gluten-free,False
+GP-0047,G-0044,Amenity,Room upgrade to suite category,False
+GP-0048,G-0031,Accessibility,Hearing-impaired kit requested,False
+GP-0049,G-0009,Dietary,Severe nut allergy - kitchen must be notified,False
+GP-0050,G-0030,Dietary,Vegetarian meals only,False
