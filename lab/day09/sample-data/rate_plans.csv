@@ -1,0 +1,13 @@
+rate_plan_id,property_id,name,nightly_rate,cancellation_policy
+RP-001,P-01,Standard Rate,298.12,Free cancellation up to 48 hours before check-in
+RP-002,P-02,Standard Rate,307.98,Free cancellation up to 48 hours before check-in
+RP-003,P-03,Advance Purchase,342.96,Non-refundable
+RP-004,P-04,Advance Purchase,304.81,Non-refundable
+RP-005,P-05,Standard Rate,196.87,Free cancellation up to 48 hours before check-in
+RP-006,P-06,Advance Purchase,171.78,Non-refundable
+RP-007,P-07,Standard Rate,228.0,Free cancellation up to 48 hours before check-in
+RP-008,P-07,Flexible Rate,246.49,Free cancellation up to 24 hours before check-in
+RP-009,P-08,Standard Rate,169.39,Free cancellation up to 48 hours before check-in
+RP-010,P-09,Flexible Rate,140.42,Free cancellation up to 24 hours before check-in
+RP-011,P-09,Standard Rate,173.31,Free cancellation up to 48 hours before check-in
+RP-012,P-10,Standard Rate,150.3,Free cancellation up to 48 hours before check-in

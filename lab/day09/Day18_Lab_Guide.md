@@ -1,6 +1,6 @@
 # Day 18 Lab Guide: Power Platform Automation
 
-Source content: `course-outline/Day18_Power_Platform_Automation_Content.md` (course-content-architect output). Every UI-specific step below (menu paths, button labels, connector and action names) was checked against Microsoft's current Power Apps and Power Automate documentation before publishing. Each exercise below is self-contained — work through any one of them with nothing else open but this document.
+Source content: `course-outline/Day18_Power_Platform_Automation_Content.md` (course-content-architect output). Every UI-specific step below (menu paths, button labels, connector and action names) was checked against Microsoft's current Power Apps, Power Automate, and Power BI documentation before publishing. Each exercise below is self-contained — work through any one of them with nothing else open but this document.
 
 ## Module 1: Power Apps & Dataverse Essentials
 
@@ -213,3 +213,94 @@ A Power-Automate-choosing team has a working flow built against its own real Dat
 **Troubleshooting:**
 - Unsure whether your team's real flow needs an approval step → none of the five teams' named Sprint 3 automations obviously need one by nature, since all are described as fully automatic ("automatically notify," "automatically send," "automatically generate and flag"). Add one only if a real customer-facing or cost-bearing action in your own flow genuinely warrants a human check first.
 - No further common pitfalls noted for this exercise beyond the approval-step judgment call above — the rest of this exercise is a direct application of Exercise 1's already-tested mechanics to different data.
+
+## Module 3: Power BI Reporting (Individual Assignment)
+
+Module 2's own Topic 4 teaches Power BI at overview level only — what a report and a dashboard are, and that Dataverse is a supported data source — because the outline's own Module 18B hands-on bullets don't ask for a built report in the shared classroom activity. The individual assignment does: "Build one Canvas app screen + one Power Automate flow + one Power BI report against sample data," submitted on your own. Module 1 and Module 2 above already cover the first two artifacts; this module covers the third, on your own time, against sample data rather than your team's shared environment.
+
+This exercise stays entirely inside the Power BI **service** at `https://app.powerbi.com` — the same cloud surface Power Apps and Power Automate already run in — rather than the Power BI Desktop application. No software installation is required: uploading data, modeling relationships and measures, building the report, and pinning to a dashboard are all done in the browser, using Power BI's web-based semantic model editor.
+
+**Sample data:** six CSV files at `lab/day09/sample-data/` — synthetic, not real guest data — modeled on the same Meridian Hospitality Group schema every module this week has used: `properties.csv` (10 rows), `rate_plans.csv` (12 rows), `guests.csv` (60 rows), `reservations.csv` (180 rows), `folios.csv` (180 rows, one per reservation), and `guest_preferences.csv` (50 rows, the same table Module 1 modeled in Dataverse — this module works from the flat CSV copy, not the Dataverse table itself, so it doesn't depend on your team's shared environment still being available).
+
+### Exercise 1: Build a Power BI Report Against Sample Hospitality Data
+**Objective:**
+By the end of this exercise, you will have a Power BI semantic model in your workspace connected to all six sample tables, related to each other through six manually-built relationships, with six DAX measures, a report page with three cards, a bar chart, a line chart, a donut chart, a table, and a slicer that filters every visual on the page at once — with three of those visuals pinned to a new dashboard. Everything is built and saved directly in the Power BI service; there is no separate publish step.
+
+**Prerequisites for this exercise:**
+- A Power BI account (a work/school account, or a free Microsoft account) you can sign in with at `https://app.powerbi.com`, and write access to at least one workspace — your own **My workspace** is enough for this individual assignment.
+- No software installation — this exercise does not use Power BI Desktop.
+- None of Module 1 or Module 2 is required to complete this exercise using the CSV sample data path.
+
+**Steps:**
+1. Go to `https://app.powerbi.com` and sign in with your Power BI account.
+2. In the left navigation pane, select the workspace you want to build this assignment in (your own **My workspace** is fine).
+3. Select **New item**, then, under **Store data**, select **Semantic model**. **[Verified current: a new semantic model in the Power BI service is started from a workspace's New item button, under Store data — confirmed against Power BI's current CSV data-source documentation.]**
+4. In the window that appears, select **CSV**.
+5. Select **Upload file**, browse to `lab/day09/sample-data/properties.csv`, select it, then select **Open**.
+6. Select **Next**.
+7. Preview the data to confirm the column headers (`property_id`, `name`, `brand`, `address`, `timezone`) and a few sample rows look correct, then select **Next**.
+8. Select **Create a semantic model only** (not **Create a report**) — you'll add the other five tables before building the report.
+9. Enter a name for the semantic model — for example **[Placeholder — replace with your own semantic model name]** — then select **Create**. Confirm the web model editor opens, showing one table, **properties**, in the **Data** pane.
+10. If the page shows **Viewing mode** near the top, switch it to **Editing mode** — every step below needs Editing mode. **[Verified current: semantic models opened in the Power BI service default to read-only Viewing mode; switching to Editing mode is required before any change (including Get data, relationships, and measures) can be made — confirmed against Power BI's current web-modeling documentation.]**
+11. In the ribbon, select **Get data**.
+12. In the Power Query **Get data** window, select **Text/CSV** (CSV files use the same connector as plain text files).
+13. Select **Upload file**, browse to `lab/day09/sample-data/rate_plans.csv`, select it, select **Open**, then complete the connector's steps to add it to the model — confirm a second table, **rate_plans**, now appears in the **Data** pane.
+14. Repeat steps 11-13 for the remaining four files, one at a time: `guests.csv`, `reservations.csv`, `folios.csv`, and `guest_preferences.csv` — confirm the **Data** pane lists all six tables when you're done: **properties**, **rate_plans**, **guests**, **reservations**, **folios**, **guest_preferences**.
+15. In the **Data** pane, expand **reservations** and confirm `check_in` and `check_out` show a date icon; expand **folios** and confirm `balance` shows a numeric icon — if a column shows a text icon instead, select that column, then use the **Properties** pane to set its correct **Data type**.
+16. Select the **reservations** table in the **Data** pane, then in the ribbon select **New column**.
+17. In the formula bar, replace the default text with `Nights = DATEDIFF(reservations[check_in], reservations[check_out], DAY)` and press **Enter** — confirm a new **Nights** column appears in **reservations**, showing a whole number of nights for every row.
+18. Look at the relationship diagram in the model editor and confirm no lines connect any of the six tables yet. **[Verified current: unlike Power BI Desktop, importing tables with Get data in the Power BI service does not auto-detect or import relationships — they must be created manually in the web model editor, even when the joining columns are named identically — confirmed against Power BI's current web-modeling documentation.]**
+19. In the ribbon, select **Manage relationships**.
+20. In the **Manage relationships** dialog, select **New relationship**.
+21. Select **rate_plans** as the first table and `property_id` as its column; select **properties** as the second table and `property_id` as its column; confirm **Cardinality** shows **Many to one (\*:1)** with **rate_plans** on the many side, then select **OK**.
+22. Repeat steps 19-21 four more times to create the remaining relationships, always picking the "many" table first: **reservations** `property_id` → **properties** `property_id`; **reservations** `guest_id` → **guests** `guest_id`; **reservations** `rate_plan_id` → **rate_plans** `rate_plan_id`; **folios** `reservation_id` → **reservations** `reservation_id`; and **guest_preferences** `guest_id` → **guests** `guest_id` — six relationships in total once you're done (the one from step 21 plus these five).
+23. Close the **Manage relationships** dialog and confirm the relationship diagram now shows six lines connecting the six tables, each ending in "1" on the one side and an asterisk "\*" on the many side.
+24. Select the **reservations** table in the **Data** pane, then in the ribbon select **New measure**. **[Verified current: a measure is created by selecting a table in the Data pane and choosing New measure in the ribbon, with a DAX formula bar carrying the same autocomplete/IntelliSense as Power BI Desktop — confirmed against Power BI's current web-modeling documentation.]**
+25. In the formula bar, enter `Total Reservations = COUNTROWS(reservations)` and press **Enter** — confirm the new measure appears under **reservations** in the **Data** pane, marked with a calculator icon.
+26. With **reservations** still selected, select **New measure** again and enter `Total Room Nights = SUM(reservations[Nights])`, then press **Enter**.
+27. Select **folios** in the **Data** pane, select **New measure**, and enter `Total Revenue = SUM(folios[balance])`, then press **Enter**.
+28. With **folios** still selected, select **New measure** again and enter `Average Daily Rate = DIVIDE([Total Revenue], [Total Room Nights])`, then press **Enter** — `DIVIDE` returns a blank instead of an error when the denominator is zero, which a plain `/` operator would not.
+29. Select **guest_preferences**, select **New measure**, and enter `Flagged Preferences = CALCULATE(COUNTROWS(guest_preferences), guest_preferences[flagged] = TRUE)`, then press **Enter**.
+30. With **guest_preferences** still selected, select **New measure** again and enter `Flagged Preference Rate = DIVIDE([Flagged Preferences], COUNTROWS(guest_preferences))`, then press **Enter** — confirm the **Data** pane now shows six calculator-icon measures in total, spread across **reservations** (Total Reservations, Total Room Nights), **folios** (Total Revenue, Average Daily Rate), and **guest_preferences** (Flagged Preferences, Flagged Preference Rate).
+31. In the ribbon, select **New report** — confirm a new browser tab opens with the report editor, built on this semantic model.
+32. On the report canvas, select a blank area, then in the **Visualizations** pane select the **Card** visual.
+33. Drag **folios**[Total Revenue] onto the card's field well — confirm the card displays a single number.
+34. Repeat steps 32-33 twice more to add a second card showing **reservations**[Total Room Nights] and a third card showing **folios**[Average Daily Rate].
+35. Select a new blank area, then in the **Visualizations** pane select the **Clustered column chart** visual.
+36. Drag **properties**[name] onto the **X-axis** field well and **folios**[Total Revenue] onto the **Y-axis** field well — confirm the chart shows one bar per property, with the three Meridian Resorts & Spa properties among the tallest bars (they carry this sample data's highest nightly rates).
+37. Select a new blank area, then select the **Line chart** visual.
+38. Drag **reservations**[check_in] onto the **X-axis** field well — Power BI adds it as a date hierarchy; select the field's dropdown arrow in the field well and choose **Month** instead of **Date**.
+39. Drag **reservations**[Total Reservations] onto the **Y-axis** field well — confirm the line shows reservation counts rising and falling by month across 2026.
+40. Select a new blank area, then select the **Donut chart** visual.
+41. Drag **guest_preferences**[preference_type] onto the **Legend** field well, then drag it a second time onto the **Values** field well — because it's a text field, Power BI automatically aggregates it as **Count of preference_type** — confirm the donut shows four slices: Dietary, Room, Amenity, and Accessibility.
+42. Select a new blank area, then select the **Table** visual.
+43. Drag **guests**[loyalty_tier], **reservations**[Total Reservations], and **folios**[Total Revenue] onto the table's **Columns** field well, in that order — confirm the table lists four rows (None, Silver, Gold, Platinum), each with its own reservation count and revenue total, proving `loyalty_tier` on **guests** correctly rolls up through the **guests** → **reservations** → **folios** relationship chain.
+44. Select a new blank area, then select the **Slicer** visual.
+45. Drag **properties**[brand] onto the slicer's field well — confirm the slicer lists four checkboxes: The Aldwyn House, Meridian Resorts & Spa, Meridian Stays, and Meridian Residences.
+46. Select one checkbox in the new slicer (for example, Meridian Resorts & Spa) and confirm every other visual on the page — both remaining cards, the bar chart, the line chart, the donut chart, and the table — updates to reflect only that brand's data.
+47. Clear the slicer selection (select the small eraser/filter icon in the slicer's top-right corner) so the report returns to showing all properties.
+48. Select **Save** near the top of the page (or press **Ctrl+S**), enter a name for the report — for example **[Placeholder — replace with your own report name]** — confirm the destination workspace matches the one from step 2, then select **Save** again — confirm a save confirmation appears and the report tab's title updates to the name you entered.
+49. Hover over the bar chart (Total Revenue by property), then select its pin icon in the visual's top-right corner. **[Verified current: dashboards exist only in the Power BI service (they cannot be created in Power BI Desktop even when Desktop is used) — a visual is pinned to one from its hover pin icon, choosing New dashboard or Existing dashboard in the Pin to dashboard dialog — confirmed against Power BI's current dashboard-creation documentation.]**
+50. In the **Pin to dashboard** dialog, select **New dashboard**, enter a name — for example **[Placeholder — replace with your own dashboard name]** — then select **Pin**.
+51. When the "Pinned to dashboard" confirmation appears, select **Go to dashboard** — confirm a new dashboard opens with one tile showing the pinned bar chart.
+52. Return to the report (select the tile, or use the left-hand navigation pane to reopen the report), then repeat steps 49-50 two more times to pin the Total Revenue card and the donut chart to the same dashboard — this time, select **Existing dashboard** and choose the dashboard you just created instead of **New dashboard**.
+53. Reopen the dashboard from the left-hand navigation pane and confirm it now shows three tiles: the bar chart, the revenue card, and the donut chart.
+
+**Expected Result:**
+One Power BI semantic model in your workspace, built entirely in the browser, connected to all six sample hospitality tables and related through six manually-built relationships; six DAX measures (Total Reservations, Total Room Nights, Total Revenue, Average Daily Rate, Flagged Preferences, Flagged Preference Rate); a saved report page with three cards, a bar chart, a line chart, a donut chart, a table, and a slicer that filters every other visual at once when a brand is selected; and a dashboard with three pinned tiles — fulfilling the individual assignment's "one Power BI report against sample data" requirement, with no Power BI Desktop installation used at any point.
+
+**Troubleshooting:**
+- The page opens in **Viewing mode** and none of the ribbon's editing buttons (Get data, New column, Manage relationships, New measure) respond → switch to **Editing mode** first (step 10); Viewing mode intentionally blocks changes.
+- Every column in a CSV preview shows as plain text instead of Date, Number, or True/False → select that column and set its **Data type** manually in the **Properties** pane rather than relying on autodetection.
+- No relationship lines appear after loading all six tables, even though the `_id` columns match exactly → this is expected, not a bug — the web Get data experience never auto-detects relationships the way Power BI Desktop does; build all six manually with **Manage relationships** → **New relationship** (steps 19-22).
+- A card or chart shows blank or shows the same total for every category → almost always a missing or wrong relationship, not a wrong measure — reopen the relationship diagram and check all six lines before touching the DAX formula.
+- **Average Daily Rate** shows an error instead of a blank for a filter with zero room nights → confirm the measure uses `DIVIDE(...)`, not a plain `/` operator; `DIVIDE` returns blank on a zero denominator instead of raising a divide-by-zero error.
+- **Save** on the report gives a permissions error → you need write (Build) permission on the semantic model and write permission on the destination workspace; **My workspace** always grants both to its owner, so switch the save destination there if your organizational workspace is the problem.
+- The pin icon doesn't appear when hovering over a visual → pin icons only appear once the report is open in **Edit** mode, not **Reading** view — select **Edit** first.
+
+**Sources:**
+- [Get data from comma separated value (CSV) files](https://learn.microsoft.com/en-us/power-bi/connect-data/service-comma-separated-value-files)
+- [Edit semantic models in the Power BI service](https://learn.microsoft.com/en-us/power-bi/transform-model/service-edit-data-models)
+- [Create a Power BI dashboard from a report](https://learn.microsoft.com/en-us/power-bi/create-reports/service-dashboard-create)
+- [What is Power BI?](https://learn.microsoft.com/en-us/power-bi/fundamentals/power-bi-overview)
+- [Create a Power BI report using the Microsoft Dataverse connector](https://learn.microsoft.com/en-us/power-apps/maker/data-platform/data-platform-powerbi-connector)

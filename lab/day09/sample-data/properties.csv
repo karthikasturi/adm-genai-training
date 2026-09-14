@@ -1,0 +1,11 @@
+property_id,name,brand,address,timezone
+P-01,The Aldwyn House,The Aldwyn House,"14 Marlborough Row, London, UK",Europe/London
+P-02,Meridian Cancun Resort & Spa,Meridian Resorts & Spa,"Blvd Kukulcan Km 12, Cancun, MX",America/Cancun
+P-03,Meridian Maui Resort & Spa,Meridian Resorts & Spa,"3800 Wailea Alanui Dr, Maui, HI",Pacific/Honolulu
+P-04,Meridian Bali Resort & Spa,Meridian Resorts & Spa,"Jl. Raya Nusa Dua, Bali, ID",Asia/Makassar
+P-05,Meridian Stays - Aspen Ridge,Meridian Stays,"220 Ridge Rd, Aspen, CO",America/Denver
+P-06,Meridian Stays - Lake Tahoe,Meridian Stays,"88 Shoreline Dr, South Lake Tahoe, CA",America/Los_Angeles
+P-07,Meridian Stays - Charleston Harbor,Meridian Stays,"4 Harborview Ln, Charleston, SC",America/New_York
+P-08,Meridian Residences Austin,Meridian Residences,"900 Congress Ave, Austin, TX",America/Chicago
+P-09,Meridian Residences Denver,Meridian Residences,"1400 Larimer St, Denver, CO",America/Denver
+P-10,Meridian Residences Seattle,Meridian Residences,"500 Pine St, Seattle, WA",America/Los_Angeles
