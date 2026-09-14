@@ -1,5 +1,5 @@
 """
-BONUS EXERCISE 10 — Evaluator-optimizer: generate, critique, regenerate until it passes
+BONUS EXERCISE 10 — Evaluator-optimizer: a conditional edge that loops back on failure
 
 *** This is enrichment, beyond today's graded outline (exercises 01-07). ***
 Not covered elsewhere in this course - see the README's "Bonus: agentic
@@ -7,21 +7,32 @@ workflow patterns" section for why it's included and cited from.
 
 CONCEPT
 -------
-Anthropic's "Building Effective Agents" names EVALUATOR-OPTIMIZER as a
-workflow pattern where one LLM call GENERATES a response while a SEPARATE
-LLM call EVALUATES it and provides feedback, looping until the evaluator is
-satisfied (or a bounded attempt count is reached - the same "don't loop
-forever" discipline exercise 04 already built for the tool-calling agent).
+Confirmed directly against LangGraph's own current documentation ("Workflows
+and agents"), EVALUATOR-OPTIMIZER is a named LangGraph pattern with a
+concrete graph shape: a generator node produces a draft, an evaluator node
+(a model call bound with structured output) grades it, and a conditional
+edge on the evaluator's OWN output either exits the graph (the draft
+passed) or loops back to the generator node with the evaluator's feedback
+attached (the draft didn't pass yet) - LangGraph's own reference example
+wires exactly this shape for a joke-writing generator and a funny/not-funny
+evaluator. The loop-back edge here is mechanically the same idea exercise
+02's decision loop already introduced (an edge pointing BACKWARD to a node
+already visited) - the difference is WHAT triggers the loop. Exercise 02
+loops because the model decided it needs another tool; this pattern loops
+because a SEPARATE evaluator call judged the output not good enough yet.
 
 This program has already built half of this pattern twice: Day 12's
 guardrailed, structured-output pattern (a pydantic schema plus
 with_structured_output, so a model's judgment comes back as a validated
 field, not a string you have to parse by hand), and day07/06_reranking_eval.py's
 RelevanceScore judge, which used exactly that pattern to SCORE a candidate
-once. What's new here is looping: instead of scoring once and stopping, the
-evaluator's feedback is fed back into a REGENERATION prompt, and the whole
+once. What's new here is looping inside an actual graph: instead of scoring
+once and stopping, the evaluator's feedback is fed back into a
+REGENERATION prompt via the loop-back edge, and the whole
 generate-evaluate cycle repeats until the evaluator marks the response as
-passing, or a max-attempts bound is hit.
+passing, or a state-held attempt count hits a bound - the same "don't loop
+forever" discipline exercise 04 already built for the tool-calling agent,
+now applied to a quality judgment instead.
 
 This is also a useful contrast with exercise 06's retry step: exercise 06
 retries an identical tool call after a FAILURE (an exception). This pattern
@@ -31,16 +42,16 @@ reason to loop, with a different bound on how many times it's allowed to.
 
 RUNNING SCENARIO
 -----------------
-Drafting a reply to a guest complaint, using an evaluator call to check
+Drafting a reply to a guest complaint, using an evaluator node to check
 whether the draft is appropriately apologetic and offers a concrete next
-step, regenerating until it passes or a bound is hit.
+step, looping back to the generator until it passes or a bound is hit.
 # [Placeholder — replace with a generation task from your own Sprint 3
 # agent task, e.g. drafting a maintenance-escalation message that must
 # name a specific vendor and timeframe before it passes]
 
 SETUP
 -----
-    pip install langchain pydantic python-dotenv
+    pip install langchain langgraph pydantic python-dotenv
     export OPENAI_API_KEY=...
     export ANTHROPIC_API_KEY=...   # optional
 """
@@ -86,44 +97,72 @@ EVALUATE_TEMPLATE_TEXT = (
 # names given.
 # =============================================================================
 
-# STEP 1 — write generate_draft(complaint: str, feedback: str = "") -> str:
-#   - build a feedback_section string: "" if feedback is empty, otherwise
-#     something like f"Address this specific feedback from the last
-#     attempt: {feedback}"
-#   - format GENERATE_TEMPLATE_TEXT with complaint and that feedback_section
-#   - call model.invoke(...) and return the response's .content
-def generate_draft(complaint: str, feedback: str = "") -> str:
+# STEP 0 — additional imports you'll need:
+#   from typing_extensions import TypedDict
+#   from langgraph.graph import StateGraph, START, END
+# YOUR CODE HERE
+
+
+# STEP 1 — define DraftState, a TypedDict with five fields: complaint (str),
+# draft (str), feedback (str), passes (bool), and attempt (int).
+# YOUR CODE HERE
+
+
+# STEP 2 — write generate_draft_node(state: DraftState) -> dict:
+#   - build a feedback_section string: "" if state.get("feedback") is empty,
+#     otherwise something like f"Address this specific feedback from the
+#     last attempt: {state['feedback']}"
+#   - format GENERATE_TEMPLATE_TEXT with state["complaint"] and that
+#     feedback_section
+#   - call model.invoke(...) to get a draft
+#   - print the attempt number (state.get("attempt", 0) + 1) and the draft
+#   - return {"draft": response.content, "attempt": state.get("attempt", 0) + 1}
+def generate_draft_node(state) -> dict:
     # YOUR CODE HERE
     pass
 
 
-# STEP 2 — write evaluate_draft(complaint: str, draft: str) -> EvaluationResult:
-#   - format EVALUATE_TEMPLATE_TEXT with complaint and draft
-#   - call evaluator_model.invoke(...) and return the EvaluationResult
-def evaluate_draft(complaint: str, draft: str) -> EvaluationResult:
+# STEP 3 — write evaluate_draft_node(state: DraftState) -> dict:
+#   - format EVALUATE_TEMPLATE_TEXT with state["complaint"] and state["draft"]
+#   - call evaluator_model.invoke(...) to get an EvaluationResult
+#   - print the evaluation (passes and feedback)
+#   - return {"passes": result.passes, "feedback": result.feedback}
+def evaluate_draft_node(state) -> dict:
     # YOUR CODE HERE
     pass
 
 
-# STEP 3 — write generate_with_evaluation(complaint: str, max_attempts: int =
-# MAX_ATTEMPTS) -> str, the actual evaluator-optimizer loop:
-#   - start with feedback = ""
-#   - for each attempt up to max_attempts:
-#       - call generate_draft(complaint, feedback) to get a draft
-#       - call evaluate_draft(complaint, draft) to get an EvaluationResult
-#       - print the attempt number, the draft, and the evaluation
-#       - if result.passes is True, return the draft immediately
-#       - otherwise, set feedback = result.feedback for the next attempt
-#   - if no attempt passes within max_attempts, print a message saying so
-#     and return the LAST draft produced anyway (a bounded loop still needs
-#     to return something, exactly like exercise 04's step-bound stop)
-def generate_with_evaluation(complaint: str, max_attempts: int = MAX_ATTEMPTS) -> str:
+# STEP 4 — write route_evaluation(state: DraftState) -> str, the conditional
+# edge function:
+#   - if state["passes"] is True, return "Accepted"
+#   - elif state["attempt"] >= MAX_ATTEMPTS, print a message saying the
+#     bound was hit and return "Give up" (a bounded loop still needs to
+#     stop and return something, exactly like exercise 04's step-bound
+#     stop)
+#   - otherwise, return "Retry"
+def route_evaluation(state) -> str:
     # YOUR CODE HERE
     pass
 
 
-# STEP 4 — call generate_with_evaluation(GUEST_COMPLAINT) and print the
-# final accepted (or last) draft.
+# STEP 5 — build the graph:
+#   - builder = StateGraph(DraftState)
+#   - add generate_draft_node and evaluate_draft_node as nodes, naming them
+#     "generate_draft" and "evaluate_draft"
+#   - connect START to "generate_draft"
+#   - connect "generate_draft" to "evaluate_draft" with a plain edge
+#   - add a conditional edge from "evaluate_draft" using route_evaluation,
+#     mapping "Accepted" -> END, "Give up" -> END, and "Retry" -> the SAME
+#     "generate_draft" node - this is the loop-back edge that makes
+#     regeneration happen with the evaluator's feedback attached
+#   - compile the graph into `optimizer_graph`
+# YOUR CODE HERE
+
+
+# STEP 6 — invoke optimizer_graph with the initial state
+# {"complaint": GUEST_COMPLAINT, "feedback": "", "attempt": 0} and print the
+# final state's draft (the accepted draft, or the last one produced if the
+# bound was hit).
 # YOUR CODE HERE
 
 
@@ -131,34 +170,39 @@ def generate_with_evaluation(complaint: str, max_attempts: int = MAX_ATTEMPTS) -
 # ----------------
 # The printed trace should show at least one attempt where passes is False
 # with specific feedback (for example, "doesn't name a concrete next step"),
-# followed by a regenerated draft that incorporates that feedback and passes
-# on a later attempt - visible, attempt-by-attempt proof the loop is
-# actually using the evaluator's feedback, not just retrying blindly.
+# followed by a regenerated draft (visible in generate_draft_node's own
+# printed attempt number and text) that incorporates that feedback and
+# passes on a later attempt - visible, attempt-by-attempt proof the
+# loop-back edge is actually carrying the evaluator's feedback forward, not
+# just re-running the same generation.
 #
 # Common Pitfalls:
 # - An evaluator rubric so lax that EVERY draft passes on attempt 1 - that
-#   never actually exercises the loop; GIVEN's rubric is deliberately
-#   demanding for exactly this reason, matching this program's own
-#   "your test case needs to surface a real difference" discipline
+#   never actually exercises the loop-back edge; GIVEN's rubric is
+#   deliberately demanding for exactly this reason, matching this program's
+#   own "your test case needs to surface a real difference" discipline
 #   (day07/06_reranking_eval.py's own closing note made the same point
 #   about evaluation query sets).
-# - Ignoring result.feedback on the next attempt (calling generate_draft
-#   with feedback="" every time) - that turns this into "just retry and
-#   hope," not evaluator-guided OPTIMIZATION.
-# - No max_attempts bound at all - the same indefinite-loop risk
-#   exercise 04's stopping-condition work exists to prevent, here applied
-#   to a quality judgment instead of a tool-calling decision.
+# - Mapping route_evaluation's "Retry" outcome to a NEW node instead of
+#   back to "generate_draft" itself - that isn't a loop, it's just a longer
+#   straight-line graph, and the evaluator's feedback never actually
+#   reaches a second generation attempt.
+# - No max_attempts bound checked inside route_evaluation at all - the
+#   same indefinite-loop risk exercise 04's stopping-condition work exists
+#   to prevent, here applied to a quality judgment instead of a
+#   tool-calling decision.
 #
 # What this demonstrates:
-# A second LLM call, dedicated ONLY to judging - never generating - catches
-# quality problems a single generating call won't reliably self-correct on
-# its own, the same principle behind day07's LLM-based reranker, now looped
-# instead of run once. Reach for this when "good enough on the first try" is
-# not a safe assumption and a clear, checkable pass/fail rubric exists;
-# reach for exercises 01-07's full agent loop when the task itself needs a
-# variable NUMBER of different actions, not just a variable number of
-# attempts at the same one.
+# A second model call, dedicated ONLY to judging - never generating -
+# catches quality problems a single generating call won't reliably
+# self-correct on its own, the same principle behind day07's LLM-based
+# reranker, now expressed as a real loop-back edge instead of a single
+# score. Reach for this when "good enough on the first try" is not a safe
+# assumption and a clear, checkable pass/fail rubric exists; reach for
+# exercises 01-07's full agent loop when the task itself needs a variable
+# NUMBER of different actions, not just a variable number of attempts at
+# the same one.
 """
 Sources:
-- Anthropic: Building Effective Agents — https://www.anthropic.com/engineering/building-effective-agents
+- LangGraph: Workflows and agents (Evaluator-optimizer) — https://docs.langchain.com/oss/python/langgraph/workflows-agents
 """

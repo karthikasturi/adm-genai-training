@@ -75,29 +75,37 @@ outline itself is deliberately tight (10 minutes of slack against the
 realistic daily ceiling) and explicitly scopes today's agent to one model
 choosing between tools — not a survey of every agentic architecture. These
 four exercises fill a genuine gap the course otherwise never covers: they
-teach Anthropic's own named **workflow** patterns (LLMs orchestrated through
-*predefined* code paths), as distinct from the full **agent** (the LLM
-*dynamically* directs its own process) exercises `01`–`07` build. Prompt
-chaining, the fifth pattern in that same reference, is not repeated here —
-it's already `lab/day06/02_sequential_chain.py` (Day 15).
+teach four **workflow** patterns (LLMs orchestrated through *predefined*
+code paths) LangGraph itself documents and provides real primitives for —
+`add_conditional_edges`, multi-edge fan-out from a shared predecessor, and
+the `Send()` API for a dynamic number of parallel branches — as distinct
+from the full **agent** (the LLM *dynamically* directs its own process)
+exercises `01`–`07` build with the same underlying `StateGraph` machinery.
+Each pattern here is built as a real, compiled graph, not a plain Python
+function standing in for one — the same primitives (`StateGraph`,
+`add_node`, `add_edge`, `add_conditional_edges`) exercises `01`–`07` already
+use, applied to a different graph *shape* per pattern. Prompt chaining, a
+fifth pattern this same LangGraph documentation names, is not repeated
+here — it's already `lab/day06/02_sequential_chain.py` (Day 15).
 
 | File | Pattern |
 |---|---|
-| `08_routing_pattern.py` | Routing: a hard-coded keyword router vs. a model-based router, on a message the keyword version can't classify |
-| `09_parallelization_pattern.py` | Parallelization (sectioning): two independent tool calls run concurrently instead of sequentially, with measured timing |
-| `10_evaluator_optimizer_pattern.py` | Evaluator-optimizer: generate → structured-output critique → regenerate, looping until a rubric passes |
-| `11_orchestrator_workers_pattern.py` | Orchestrator-workers: one model decomposes a task into a *variable* number of subtasks, delegates each as a worker call, synthesizes the results |
+| `08_routing_pattern.py` | Routing: a hard-coded keyword router (plain Python, for contrast) vs. a `StateGraph` with a structured-output classifier node and `add_conditional_edges` dispatching to one of three destination nodes |
+| `09_parallelization_pattern.py` | Parallelization: the SAME two tool-calling nodes wired two ways — two edges fanned out from `START` (concurrent, same superstep) vs. a straight line (sequential) — with measured timing proving the edge topology, not hand-written threading, is what creates the speedup |
+| `10_evaluator_optimizer_pattern.py` | Evaluator-optimizer: a generator node and an evaluator node (structured-output critique), with a conditional edge looping back to the generator until the evaluator's rubric passes or a bound is hit |
+| `11_orchestrator_workers_pattern.py` | Orchestrator-workers: an orchestrator node decomposes a task into a *variable* number of subtasks, `Send()` dynamically fans out one worker-node call per subtask, a synthesizer node combines the results |
 
 **A scope note worth reading before `11`:** today's own course content is
 explicit that a distributed multi-agent system with more than one model
 coordinating is out of scope for Day 17. `11_orchestrator_workers_pattern.py`
-stays inside that boundary deliberately — there is exactly **one** model in
-that file, called in two different roles (orchestrator, then worker), not
-multiple agents. The file's own scope note says this again, in place, before
-any code.
+stays inside that boundary deliberately — there is exactly **one** model and
+**one** compiled graph in that file; `Send()` dispatches multiple calls to
+one worker *node*, not multiple agents. The file's own scope note says this
+again, in place, before any code.
 
 **Sources:**
-- [Anthropic: Building Effective Agents](https://www.anthropic.com/engineering/building-effective-agents)
+- [LangGraph: Workflows and agents](https://docs.langchain.com/oss/python/langgraph/workflows-agents) — the routing, parallelization, evaluator-optimizer, and orchestrator-worker graph shapes these four files build
+- [LangGraph runtime (Pregel / superstep execution)](https://docs.langchain.com/oss/python/langgraph/pregel) — cited in `09` for why same-superstep nodes actually run concurrently
 
 ## Core-adjacent: `create_agent` comparison
 
